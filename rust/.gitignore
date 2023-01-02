@@ -1,1 +1,2 @@
-rust-exercism.code-workspace
+./rust-exercism.code-workspace
+./.gitignore
