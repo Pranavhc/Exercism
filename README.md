@@ -1,2 +1,2 @@
 # Exercism
-<h1>Exercises from exercism.org</h1>
+<h3>Exercises from exercism.org</h3>
