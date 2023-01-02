@@ -11,16 +11,21 @@ impl<T> Node<T> {
 
 pub struct SimpleLinkedList<T> {
     head: Option<Box<Node<T>>>,
+    length: usize,
 }
 
 impl<T> SimpleLinkedList<T> {
     pub fn new() -> Self {
-        Self { head: None }
+        Self {
+            head: None,
+            length: 0,
+        }
     }
 
     pub fn push(&mut self, _element: T) {
         let node = Node::new(_element, self.head.take());
         self.head = Some(Box::new(node));
+        self.length += 1;
     }
 
     pub fn pop(&mut self) -> Option<T> {
@@ -28,6 +33,7 @@ impl<T> SimpleLinkedList<T> {
             None => None,
             Some(node) => {
                 self.head = node.next;
+                self.length -= 1;
                 Some(node.data)
             }
         }
@@ -41,40 +47,32 @@ impl<T> SimpleLinkedList<T> {
     }
 
     pub fn is_empty(&self) -> bool {
-        match self.head.is_some() {
-            true => false,
-            false => true,
-        }
+        self.length == 0
     }
 
     pub fn len(&self) -> usize {
-        if self.is_empty() {
-            return 0;
-        }
-
-        let mut curr = &self.head;
-        let mut length: usize = 0;
-        while let Some(node) = curr {
-            length += 1;
-            curr = &node.next;
-        }
-        length
+        self.length.clone()
     }
 
     #[must_use]
     pub fn rev(&mut self) -> SimpleLinkedList<T> {
         let mut curr = self.head.take();
         let mut prev: Option<Box<Node<T>>> = None;
+
         while let Some(mut node) = curr.take() {
             curr = node.next.take();
             node.next = prev.take();
             prev = Some(node);
         }
-        Self { head: prev }
+
+        Self {
+            head: prev,
+            length: self.length,
+        }
     }
 }
 
-// imp take - I is the element in IntoIterator<Item>
+// defines how SimpleLinkedList will be created from an iterator of a collection such as Vec
 impl<T> FromIterator<T> for SimpleLinkedList<T> {
     fn from_iter<I: IntoIterator<Item = T>>(_iter: I) -> Self {
         let mut ll = SimpleLinkedList::<T>::new();
@@ -89,24 +87,23 @@ impl<T> FromIterator<T> for SimpleLinkedList<T> {
 // instead of implementing an explicit conversion to a vector. This is because, together,
 // FromIterator and IntoIterator enable conversion between arbitrary collections.
 // Given that implementation, converting to a vector is trivial:
-// let vec: Vec<_> = simple_linked_list.into_iter().collect();
+//  let vec: Vec<_> = simple_linked_list.into_iter().collect();
 
 // The reason this exercise's API includes an explicit conversion to Vec<T> instead
 // of IntoIterator is that implementing that interface is fairly complicated, and
 // demands more of the student than we expect at this point in the track.
 
-// Converts LinkedList into Vec - proveds .into() method to the SimpleLinkedList<T>
-impl<T: Copy> From<SimpleLinkedList<T>> for Vec<T> {
+// Converts LinkedList into Vec - provides .into() method to the SimpleLinkedList<T>
+impl<T> From<SimpleLinkedList<T>> for Vec<T> {
     fn from(mut _linked_list: SimpleLinkedList<T>) -> Vec<T> {
-        _linked_list = _linked_list.rev();
-        let mut curr = &_linked_list.head;
-
+        let mut curr = _linked_list.head;
         let mut list = Vec::<T>::new();
 
         while let Some(node) = curr {
             list.push(node.data);
-            curr = &node.next;
+            curr = node.next;
         }
+        list.reverse();
         list
     }
 }
