@@ -93,7 +93,7 @@ impl<T> FromIterator<T> for SimpleLinkedList<T> {
 // of IntoIterator is that implementing that interface is fairly complicated, and
 // demands more of the student than we expect at this point in the track.
 
-// Converts LinkedList into Vec - provides .into() method to the SimpleLinkedList
+// Converts LinkedList into Vec - provides .into() method to the SimpleLinkedList<T>
 impl<T> From<SimpleLinkedList<T>> for Vec<T> {
     fn from(mut _linked_list: SimpleLinkedList<T>) -> Vec<T> {
         let mut curr = _linked_list.head;
